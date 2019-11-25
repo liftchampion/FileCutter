@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Cutter</title>
 </head>
 <body>
 <script>
@@ -13,17 +13,55 @@ function download(filename, text) {
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
     element.setAttribute('download', filename);
-
     element.style.display = 'none';
     document.body.appendChild(element);
-
     element.click();
-
     document.body.removeChild(element);
 }
 
+function find_Nth_matching_line(array, line, n) {
+    let counter = 0;
+    for (index = 0; index < array.length; index++) {
+        if (array[index].trim() === line) {
+            ++counter;
+            // console.log(index);
+            if (counter === n) {
+                return index;
+            }
+        }
+    }
+    alert("ERROR IN FINDING LINE " + line);
+}
+
+function find_line_with_word(array, word) {
+    for (index = 0; index < array.length; index++) {
+        if (array[index].match(word)) {
+            // console.log(index);
+            // console.log(array[index]);
+            return index;
+        }
+    }
+    alert("ERROR IN FINDING WORD " + word);
+    //close();
+}
+
 function cut(content) {
- return content;
+    let lines = content.split('\n');
+    let orders_begin_idx = find_line_with_word(lines, "Ордера") - 1;
+    let orders_end_idx = find_Nth_matching_line(lines.slice(orders_begin_idx), "</tr>", 3) + orders_begin_idx + 1;
+    //console.log(lines.slice(orders_begin_idx, orders_end_idx));
+    let result_str = "";
+    for (index = 0; index < lines.length; index++) {
+        if (index < orders_begin_idx || index >= orders_end_idx) {
+            result_str += lines[index] + '\n';
+        }
+    }
+    return result_str;
+}
+
+function create_new(contents) {
+    let new_content = cut(contents);
+    download(filename, new_content);
 }
 
 function create_new(contents) {
